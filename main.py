@@ -1,6 +1,5 @@
-from cgi import test
-from turtle import right
 import pygame
+
 # initializing the pygame.
 pygame.init()
 
@@ -71,6 +70,18 @@ class Ball:
         self.y = self.original_y
         self.x_vel*= -1
         self.y_vel = 0
+
+
+# function for pre-game window.
+def pre_window(win):
+    win.fill(BLACK)
+    start = SCORE_FONT.render("Welcome To Pong!!!", 1, WHITE)
+    command = pygame.font.SysFont("comicsans", 20).render("Press Enter To start game!", 1, WHITE)
+    win.blit(start, (WIDTH//2 - start.get_width()//2, 
+    HEIGHT//4 - start.get_height()))
+    win.blit(command, (WIDTH//2 - command.get_width()//2, 
+    HEIGHT//2 - command.get_height()))
+    pygame.display.update()
 
 # Function for displaying wining window.
 def winning_window(win, win_text):
@@ -165,6 +176,7 @@ def main():
     left_score = 0
     right_score = 0
 
+    intial = True
     while run:
         # Iterating through all the events happing on the screen.
         clock.tick(FPS)
@@ -172,39 +184,49 @@ def main():
             if event.type == pygame.QUIT:
                 run = False
                 break
-        # for drawing all the elements on the screen
-        draw(WINDOW, [Left_paddle,Right_paddle], ball, left_score, right_score)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    intial = False
+        if intial:
+            pre_window(WINDOW)
+        else:
+            # for drawing all the elements on the screen
+            draw(WINDOW, [Left_paddle,Right_paddle], ball, left_score, right_score)
 
-        # for movement of the paddles.
-        handle_movement(Left_paddle, Right_paddle, pygame.key.get_pressed())
-        
-        ball.move() #moving the ball.
+            # for movement of the paddles.
+            handle_movement(Left_paddle, Right_paddle, pygame.key.get_pressed())
+            
+            ball.move() #moving the ball.
 
-        # handling the collision by using handling collision Function.
-        handle_collision(Left_paddle, Right_paddle, ball)
+            # handling the collision by using handling collision Function.
+            handle_collision(Left_paddle, Right_paddle, ball)
 
-        if ball.x - Ball.radius<= 0:
-            right_score+= 1
-            ball.reset()
-        elif ball.x + Ball.radius >= WIDTH:
-            left_score+= 1
-            ball.reset()
-        
-        won = False
-        if right_score >= WINNING_SCORE:
-            won = True
-            win_text = "Right Player Won !!!"
-        elif left_score >= WINNING_SCORE:
-            won = True
-            win_text = "Left Player Won !!!"
-
-        if won:
-            winning_window(WINDOW, win_text)
-            ball.reset()
-            Left_paddle.reset()
-            Right_paddle.reset()
-            left_score = 0
-            right_score = 0
+            # Handling the score increment.
+            if ball.x - Ball.radius<= 0:
+                right_score+= 1
+                ball.reset()
+            elif ball.x + Ball.radius >= WIDTH:
+                left_score+= 1
+                ball.reset()
+            
+            won = False
+            # if any player reaches the winning score make won = true and intialize winning text.
+            if right_score >= WINNING_SCORE:
+                won = True
+                win_text = "Right Player Won !!!"
+            elif left_score >= WINNING_SCORE:
+                won = True
+                win_text = "Left Player Won !!!"
+            
+            # After winning code.
+            if won:
+                winning_window(WINDOW, win_text)
+                ball.reset()
+                Left_paddle.reset()
+                Right_paddle.reset()
+                left_score = 0
+                right_score = 0
+                intial = True
     pygame.quit()
 
 
