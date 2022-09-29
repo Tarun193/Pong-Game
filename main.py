@@ -1,6 +1,4 @@
 import pickle
-from turtle import width
-from django import conf
 import neat
 import pygame
 import os 
